@@ -1,0 +1,25 @@
+{
+  "name": "jobly",
+  "version": "1.0.0",
+  "description": "A web app where users can search for and apply to jobs. Uses Node, Express, and Postgres.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "colors": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.1",
+    "jest": "^29.7.0",
+    "jsonschema": "^1.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.13.1",
+    "supertest": "^7.0.0"
+  }
+}
