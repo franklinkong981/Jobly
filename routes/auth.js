@@ -10,7 +10,7 @@ const router = new express.Router();
 const { createToken } = require("../helpers/tokens");
 const userAuthSchema = require("../schemas/userAuth.json");
 const userRegisterSchema = require("../schemas/userRegister.json");
-const { BadRequestError } = require("../expressError");
+const { BadRequestError } = require("../errors/expressError");
 
 /** POST /auth/token:  { username, password } => { token }
  *
