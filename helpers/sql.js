@@ -22,7 +22,7 @@ If dataToUpdate = {"firstName": "Franklin", "lastName": "Kong", "email": frankli
 jsToSql = {"firstName": "first_name", "lastName": "last_name"} NOTE that email isn't included because it's the same in JS and SQL.
 Then sqlForPartialUpdate(dataToUpdate, jsToSql) -->
 {
-  setCols: "first_name = $1, last_name = $2, email = $3"
+  setCols: '"first_name"=$1, "last_name"=$2, "email"=$3'
   values: ["Franklin", "Kong", "franklinkong981@gmail.com"]. NOTE: "Franklin" is first value because first_name is $1, etc.
 }
 */
