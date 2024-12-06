@@ -82,7 +82,115 @@ describe("findAll", function () {
         description: "Desc3",
         numEmployees: 3,
         logoUrl: "http://c3.img",
+      }
+    ]);
+  });
+});
+
+/************************************** findAll */
+
+describe("findFiltered", function() {
+  test("works: name only", async function() {
+    const query = {name: "c3"};
+    let filteredCompanies = await Company.findFiltered(query);
+    expect(filteredCompanies).toEqual([
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img"
+      }
+    ]);
+  });
+
+  test("works: minEmployees only", async function() {
+    const query = {minEmployees: 2};
+    let filteredCompanies = await Company.findFiltered(query);
+    expect(filteredCompanies).toEqual([
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
       },
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      }
+    ]);
+  });
+
+  test("works: maxEmployees only", async function() {
+    const query = {maxEmployees: 2};
+    let filteredCompanies = await Company.findFiltered(query);
+    expect(filteredCompanies).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      }
+    ]);
+  });
+
+  test("All 3", async function() {
+    const query = {name: "c2", minEmployees: 2, maxEmployees: 2};
+    let filteredCompanies = await Company.findFiltered(query);
+    expect(filteredCompanies).toEqual([
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      }
+    ]);
+  });
+
+  test("no matches", async function() {
+    const query = {name: "IBM", minEmployees: 2, maxEmployees: 2};
+    let filteredCompanies = await Company.findFiltered(query);
+    expect(filteredCompanies).toEqual([]);
+  });
+
+  test("case-insensitive and LIKE works", async function() {
+    const query = {name: "C"};
+    let filteredCompanies = await Company.findFiltered(query);
+    expect(filteredCompanies).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      }
     ]);
   });
 });

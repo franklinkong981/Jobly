@@ -76,16 +76,16 @@ class Company {
     }
     if (Object.hasOwn(query, "minEmployees")) {
       if (numParts > 0) filteringString += " AND ";
-      filteringString += `num_employees > ${query.minEmployees}`;
+      filteringString += `num_employees >= ${query.minEmployees}`;
       numParts++;
     }
     if (Object.hasOwn(query, "maxEmployees")) {
       if (numParts > 0) filteringString += " AND ";
-      filteringString += `num_employees < ${query.maxEmployees}`;
+      filteringString += `num_employees <= ${query.maxEmployees}`;
     }
 
     const companiesRes = await db.query(
-      `SELECT handle, name, description, num_employees AS "numEmployees", logo_url AS "logoURL"
+      `SELECT handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"
         FROM companies
         WHERE
         ${filteringString}
