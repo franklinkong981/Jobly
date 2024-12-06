@@ -39,20 +39,46 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
   }
 });
 
+/* Validates the query string in a company filtered search. 
+query = object containing properties and values of the query string passed in the request.*/
+function validateCompanySearchQuery(query) {
+  for (const key of Object.keys(query)) {
+    if (key !== "name" && key != "minEmployees" && key != "maxEmployees") {
+      throw new BadRequestError("The query string must only containg the following properties: name, minEmployees, and maxEmployees");
+    }
+  }
+  if (Object.hasOwn(query, "minEmployees") && Object.hasOwn(query, "maxEmployees") && query.minEmployees > query.maxEmployees) {
+    throw new BadRequestError("The minEmployees cannot be greater than maxEmployees");
+  }
+}
+
 /** GET /  =>
  *   { companies: [ { handle, name, description, numEmployees, logoUrl }, ...] }
  *
- * Can filter on provided search filters:
+ * Can filter on provided search filters in the query string:
  * - minEmployees
  * - maxEmployees
- * - nameLike (will find case-insensitive, partial matches)
+ * - name (will find case-insensitive LIKE matches, partial matches)
+ * 
+ * The query string can ONLY contain the parameters name, minEmployees, and/or maxEmployees.
+ * minEmployees CANNOT be greater than maxEmployees.
  *
  * Authorization required: none
  */
 
 router.get("/", async function (req, res, next) {
+  let companies;
   try {
-    const companies = await Company.findAll();
+    //if no query string, return all companies.
+    if (Object.keys(req.query).length === 0) {
+      companies = await Company.findAll();
+    } else {
+      validateCompanySearchQuery(req.query);
+        
+      companies = await Company.findFiltered(req.query);
+    }
+
+    console.log(`Got total of ${companies.length} companies!`);
     return res.json({ companies });
   } catch (err) {
     return next(err);

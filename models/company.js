@@ -61,6 +61,39 @@ class Company {
     return companiesRes.rows;
   }
 
+  /** Find all filtered companies whose names or part of their names match the query.name parameter (if provided), have at least
+   * query.minEmployees employees (if provided) and at most query.maxEmployees employees (if provided).
+   *
+   * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
+   * */
+  static async findFiltered(query) {
+    //builds the string to be used after the WHERE clause
+    let numParts = 0;
+    let filteringString = "";
+    if (Object.hasOwn(query, "name")) {
+      filteringString += `name ILIKE '%${query.name}%'`;
+      numParts++;
+    }
+    if (Object.hasOwn(query, "minEmployees")) {
+      if (numParts > 0) filteringString += " AND ";
+      filteringString += `num_employees > ${query.minEmployees}`;
+      numParts++;
+    }
+    if (Object.hasOwn(query, "maxEmployees")) {
+      if (numParts > 0) filteringString += " AND ";
+      filteringString += `num_employees < ${query.maxEmployees}`;
+    }
+
+    const companiesRes = await db.query(
+      `SELECT handle, name, description, num_employees AS "numEmployees", logo_url AS "logoURL"
+        FROM companies
+        WHERE
+        ${filteringString}
+        ORDER BY name`
+    );
+    return companiesRes.rows;
+  }
+
   /** Given a company handle, return data about company.
    *
    * Returns { handle, name, description, numEmployees, logoUrl, jobs }
