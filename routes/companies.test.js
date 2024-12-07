@@ -96,6 +96,33 @@ describe("GET /companies", function () {
     });
   });
 
+  test("ok for anon with filtering", async function() {
+    const resp = await request(app).get("/companies?name=c1");
+    expect(resp.body).toEqual({
+      companies: [
+        {
+          handle: "c1",
+          name: "C1",
+          description: "Desc1",
+          numEmployees: 1,
+          logoUrl: "http://c1.img"
+        }
+      ]
+    });
+  });
+
+  test("FAILS: Query string contains invalid parameters", async function() {
+    const resp = await request(app).get("/companies?name=c1&movie=Dark&minEmployees=2");
+    expect(resp.statusCode).toEqual(400);
+    expect(resp.body.error.message).toEqual("The query string must only containg the following properties: name, minEmployees, and maxEmployees");
+  });
+
+  test("FAILS: minEmployees > maxEmployees", async function() {
+    const resp = await request(app).get("/companies?minEmployees=3&maxEmployees=2");
+    expect(resp.statusCode).toEqual(400);
+    expect(resp.body.error.message).toEqual("The minEmployees cannot be greater than maxEmployees");
+  });
+
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
     // thus making it hard to test that the error-handler works with it. This
