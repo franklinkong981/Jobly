@@ -20,6 +20,8 @@ const router = express.Router();
  * Adds a new user. This is not the registration endpoint --- instead, this is
  * only for admin users to add new users. The new user being added can be an
  * admin.
+ * 
+ * NOTE: ADMINS CAN'T BE CREATED VIA /register ROUTE, ONLY THIS WAY.
  *
  * This returns the newly created user and an authentication token for them:
  *  {user: { username, firstName, lastName, email, isAdmin }, token }
