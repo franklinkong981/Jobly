@@ -70,7 +70,7 @@ function ensureIsAdmin(req, res, next){
 
 function ensureIsAdminOrCorrectUser(req, res, next){
   try{
-    if ((!res.locals.user.isAdmin) || (!res.locals.user.username != req.params.username)) {
+    if ((!res.locals.user.isAdmin) && (res.locals.user.username != req.params.username)) {
       throw new ForbiddenError("You can only view, edit, or delete information about your own account!");
     }
     return next();
