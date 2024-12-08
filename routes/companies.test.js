@@ -41,12 +41,19 @@ describe("POST /companies", function () {
     });
   });
 
-  test("not ok for non-admins", async function() {
+  test("not ok for logged in non-admins", async function() {
     const resp = await request(app)
         .post("/companies")
         .send(newCompany)
-        .set("authorization", `Bearer ${u1Token}`);
-    expect(resp.statusCode).toEqual(201);
+        .set("authorization", `Bearer ${u2Token}`);
+    expect(resp.statusCode).toEqual(403);
+  });
+
+  test("not ok for logged out users", async function() {
+    const resp = await request(app)
+        .post("/companies")
+        .send(newCompany);
+    expect(resp.statusCode).toEqual(401);
   });
 
   test("bad request with missing data", async function () {
@@ -200,7 +207,17 @@ describe("PATCH /companies/:handle", function () {
     });
   });
 
-  test("unauth for anon", async function () {
+  test("doesn't work for logged in non-admin", async function () {
+    const resp = await request(app)
+        .patch(`/companies/c1`)
+        .send({
+          name: "C1-new",
+        })
+        .set("authorization", `Bearer ${u2Token}`);
+    expect(resp.statusCode).toEqual(403);
+  });
+
+  test("doesn't work for logged out user", async function () {
     const resp = await request(app)
         .patch(`/companies/c1`)
         .send({
@@ -250,7 +267,14 @@ describe("DELETE /companies/:handle", function () {
     expect(resp.body).toEqual({ deleted: "c1" });
   });
 
-  test("unauth for anon", async function () {
+  test("doesn't work for logged in non-admin", async function () {
+    const resp = await request(app)
+        .delete(`/companies/c1`)
+        .set("authorization", `Bearer ${u2Token}`);
+    expect(resp.statusCode).toEqual(403);
+  });
+
+  test("doesn't work for logged out user", async function () {
     const resp = await request(app)
         .delete(`/companies/c1`);
     expect(resp.statusCode).toEqual(401);
