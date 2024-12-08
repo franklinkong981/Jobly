@@ -62,8 +62,26 @@ function ensureIsAdmin(req, res, next){
   }
 }
 
+/** Middleware to use when they must be either an admin or the user whose username matches the username supplied in the route parameters.
+ * 
+ * If not, raises ForbiddenError.
+ * Will usually be run after ensureLoggedIn.
+ */
+
+function ensureIsAdminOrCorrectUser(req, res, next){
+  try{
+    if ((!res.locals.user.isAdmin) || (!res.locals.user.username != req.params.username)) {
+      throw new ForbiddenError("You can only view, edit, or delete information about your own account!");
+    }
+    return next();
+  } catch(err) {
+    return next(err);
+  }
+}
+
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
-  ensureIsAdmin
+  ensureIsAdmin,
+  ensureIsAdminOrCorrectUser
 };
