@@ -31,8 +31,59 @@ router.post("/", ensureLoggedIn, ensureIsAdmin, async function (req, res, next) 
       throw new BadRequestError(errs);
     }
 
-    const company = await Company.create(req.body);
-    return res.status(201).json({ company });
+    const new_job = await Job.create(req.body);
+    return res.status(201).json({ new_job });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** GET /  =>
+ *   { jobs: [ { id, title, salary, equity, companyHandle }, ...] }
+ *
+ * Authorization required: none
+ */
+
+  router.get("/", async function (req, res, next) {
+    let all_jobs;
+    try {
+      all_jobs = await Job.findAll();
+      return res.json({ all_jobs });
+    } catch (err) {
+      return next(err);
+    }
+  });
+
+  /* router.get("/", async function (req, res, next) {
+    let all_jobs;
+    try {
+      //if no query string, return all companies.
+      if (Object.keys(req.query).length === 0) {
+        companies = await Company.findAll();
+      } else {
+        validateCompanySearchQuery(req.query);
+          
+        companies = await Company.findFiltered(req.query);
+      }
+  
+      console.log(`Got total of ${companies.length} companies!`);
+      return res.json({ companies });
+    } catch (err) {
+      return next(err);
+    }
+  }); */
+
+  /** GET /[id]  =>  { job }
+ *
+ *  Company is { id, title, salary, equity, companyHandle }
+ *
+ * Authorization required: none
+ */
+
+router.get("/:id", async function (req, res, next) {
+  try {
+    const job = await Job.get(req.params.id);
+    return res.json({ job });
   } catch (err) {
     return next(err);
   }
