@@ -113,11 +113,13 @@ class Job {
     const result = await db.query(
           `DELETE FROM jobs
            WHERE id = $1
-           RETURNING id`,
+           RETURNING id, title`,
         [id]);
     const job = result.rows[0];
 
     if (!job) throw new NotFoundError(`Job with id of ${id} not found.`);
+
+    return job;
   }
 }
 

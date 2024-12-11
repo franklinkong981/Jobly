@@ -31,8 +31,8 @@ router.post("/", ensureLoggedIn, ensureIsAdmin, async function (req, res, next) 
       throw new BadRequestError(errs);
     }
 
-    const new_job = await Job.create(req.body);
-    return res.status(201).json({ new_job });
+    const newJob = await Job.create(req.body);
+    return res.status(201).json({ newJob });
   } catch (err) {
     return next(err);
   }
@@ -45,10 +45,10 @@ router.post("/", ensureLoggedIn, ensureIsAdmin, async function (req, res, next) 
  */
 
   router.get("/", async function (req, res, next) {
-    let all_jobs;
+    let allJobs;
     try {
-      all_jobs = await Job.findAll();
-      return res.json({ all_jobs });
+      allJobs = await Job.findAll();
+      return res.json({ allJobs });
     } catch (err) {
       return next(err);
     }
@@ -108,8 +108,8 @@ router.patch("/:id", ensureLoggedIn, ensureIsAdmin, async function (req, res, ne
       throw new BadRequestError(errs);
     }
 
-    const updated_job = await Job.update(req.params.id, req.body);
-    return res.json({ updated_job });
+    const updatedJob = await Job.update(req.params.id, req.body);
+    return res.json({ updatedJob });
   } catch (err) {
     return next(err);
   }
@@ -122,8 +122,8 @@ router.patch("/:id", ensureLoggedIn, ensureIsAdmin, async function (req, res, ne
 
 router.delete("/:id", ensureLoggedIn, ensureIsAdmin, async function (req, res, next) {
   try {
-    await Job.remove(req.params.id);
-    return res.json({ deleted: req.params.id });
+    const deleted_job = await Job.remove(req.params.id);
+    return res.json({ deleted: `Job with id ${deleted_job.id}, title ${deleted_job.title}` });
   } catch (err) {
     return next(err);
   }

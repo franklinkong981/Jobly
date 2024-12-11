@@ -3,6 +3,7 @@
 const db = require("../db.js");
 const User = require("../models/user");
 const Company = require("../models/company");
+const Job = require("../models/job");
 const { createToken } = require("../helpers/tokens");
 
 async function commonBeforeAll() {
@@ -10,6 +11,9 @@ async function commonBeforeAll() {
   await db.query("DELETE FROM users");
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM companies");
+  //gets rid of all existing data in Jobs table and resets auto-incrementing ids to 1.
+  await db.query("DELETE FROM jobs");
+  await db.query("ALTER SEQUENCE jobs_id_seq RESTART WITH 1");
 
   await Company.create(
       {
@@ -35,6 +39,10 @@ async function commonBeforeAll() {
         description: "Desc3",
         logoUrl: "http://c3.img",
       });
+  
+  await Job.create({title: 'j1', salary: 100, equity: 0.6, companyHandle: 'c1'});
+  await Job.create({title: 'j2', salary: 150, equity: 0.5, companyHandle: 'c2'});
+  await Job.create({title: 'j3', salary: 200, equity: 0.7, companyHandle: 'c3'});
 
   await User.register({
     username: "u1",
