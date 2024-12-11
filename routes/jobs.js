@@ -73,7 +73,7 @@ router.post("/", ensureLoggedIn, ensureIsAdmin, async function (req, res, next) 
     }
   }); */
 
-  /** GET /[id]  =>  { job }
+/** GET /[id]  =>  { job }
  *
  *  Company is { id, title, salary, equity, companyHandle }
  *
@@ -88,3 +88,47 @@ router.get("/:id", async function (req, res, next) {
     return next(err);
   }
 });
+
+/** PATCH /[id] { fld1, fld2, ... } => { company }
+ *
+ * Partially updates a job's data.
+ *
+ * fields can be any combination of the following: { title, salary, equity }
+ *
+ * Returns { id, title, salary, equity, companyHandle }
+ *
+ * Authorization required: logged in AND is an admin
+ */
+
+router.patch("/:id", ensureLoggedIn, ensureIsAdmin, async function (req, res, next) {
+  try {
+    const validator = jsonschema.validate(req.body, jobUpdateSchema);
+    if (!validator.valid) {
+      const errs = validator.errors.map(e => e.stack);
+      throw new BadRequestError(errs);
+    }
+
+    const updated_job = await Job.update(req.params.id, req.body);
+    return res.json({ updated_job });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** DELETE /[id]  =>  { deleted: id }
+ *
+ * Authorization: logged in AND is an admin
+ */
+
+router.delete("/:id", ensureLoggedIn, ensureIsAdmin, async function (req, res, next) {
+  try {
+    await Job.remove(req.params.id);
+    return res.json({ deleted: req.params.id });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
+module.exports = router;
+
