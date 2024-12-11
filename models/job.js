@@ -38,6 +38,40 @@ class Job {
     return new_job;
   }
 
+  /** Find all filtered jobs whose names or part of their names match the query.title parameter (if provided) and has a salary of at least
+   * query.minSalary (if provided). In addition, it only returns jobs with a non-zero equity if the query.hasEquity parameter (if provided)
+   * is set to true.
+   *
+   * Returns [{ id, title, salary, equity, companyHandle }, ...]
+   * */
+  static async findFiltered(query) {
+    //builds the string to be used after the WHERE clause
+    let numParts = 0;
+    let filteringString = "";
+    if (Object.hasOwn(query, "title")) {
+      filteringString += `title ILIKE '%${query.title}%'`;
+      numParts++;
+    }
+    if (Object.hasOwn(query, "minSalary")) {
+      if (numParts > 0) filteringString += " AND ";
+      filteringString += `salary >= ${query.minSalary}`;
+      numParts++;
+    }
+    if (Object.hasOwn(query, "hasEquity") && query.hasEquity) {
+      if (numParts > 0) filteringString += " AND ";
+      filteringString += `equity > 0`;
+    }
+
+    const jobsRes = await db.query(
+      `SELECT id, title, salary, equity, company_handle AS "companyHandle"
+        FROM jobs
+        WHERE
+        ${filteringString}
+        ORDER BY title`
+    );
+    return jobsRes.rows;
+  }
+
   /** Find and return all jobs.
    *
    * Returns [{ id, title, salary, equity, companyHandle }, ...]
