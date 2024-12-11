@@ -57,7 +57,7 @@ class Job {
       filteringString += `salary >= ${query.minSalary}`;
       numParts++;
     }
-    if (Object.hasOwn(query, "hasEquity") && query.hasEquity) {
+    if (Object.hasOwn(query, "hasEquity") && query.hasEquity === "true") {
       if (numParts > 0) filteringString += " AND ";
       filteringString += `equity > 0`;
     }

@@ -39,15 +39,24 @@ router.post("/", ensureLoggedIn, ensureIsAdmin, async function (req, res, next) 
 });
 
 /* Validates the query string in a job filtered search. 
-query = object containing properties and values of the query string passed in the request.*/
+query = object containing properties and values of the query string passed in the request.
+
+The query can only contain up to 3 parameters (and no other ones): title, minSalary, and hasEquity.
+minSalary must be a number and hasEquity can only be either "true" or "false".*/
 function validateJobSearchQuery(query) {
   for (const key of Object.keys(query)) {
     if (key !== "title" && key != "minSalary" && key != "hasEquity") {
       throw new BadRequestError("The query string must only contain the following properties: title, minSalary, hasEquity");
     }
   }
-  if (Object.hasOwn(query, "minEmployees") && Object.hasOwn(query, "maxEmployees") && query.minEmployees > query.maxEmployees) {
-    throw new BadRequestError("The minEmployees cannot be greater than maxEmployees");
+
+  //make sure minSalary parameter is a number.
+  if (Object.hasOwn(query, "minSalary") && isNaN(parseInt(query.minSalary))) {
+    throw new BadRequestError("minSalary parameter in the query string must be a number");
+  }
+  //make sure hasEquity is either true or false, thus can be converted to a boolean.
+  if (Object.hasOwn(query, "hasEquity") && query.hasEquity !== "true" && query.hasEquity !== "false") {
+    throw new BadRequestError("hasEquity parameter in the query string must be either true or false");
   }
 }
 
@@ -60,31 +69,21 @@ function validateJobSearchQuery(query) {
   router.get("/", async function (req, res, next) {
     let allJobs;
     try {
-      allJobs = await Job.findAll();
+      //if no query string, return all companies.
+      if (Object.keys(req.query).length === 0) {
+        allJobs = await Job.findAll();
+      } else {
+        validateJobSearchQuery(req.query);
+
+        allJobs = await Job.findFiltered(req.query);
+      }
+
+      console.log(`Got total of ${allJobs.length} jobs!`);
       return res.json({ allJobs });
     } catch (err) {
       return next(err);
     }
   });
-
-  /* router.get("/", async function (req, res, next) {
-    let all_jobs;
-    try {
-      //if no query string, return all companies.
-      if (Object.keys(req.query).length === 0) {
-        companies = await Company.findAll();
-      } else {
-        validateCompanySearchQuery(req.query);
-          
-        companies = await Company.findFiltered(req.query);
-      }
-  
-      console.log(`Got total of ${companies.length} companies!`);
-      return res.json({ companies });
-    } catch (err) {
-      return next(err);
-    }
-  }); */
 
 /** GET /[id]  =>  { job }
  *

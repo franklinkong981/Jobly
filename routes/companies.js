@@ -40,7 +40,10 @@ router.post("/", ensureLoggedIn, ensureIsAdmin, async function (req, res, next) 
 });
 
 /* Validates the query string in a company filtered search. 
-query = object containing properties and values of the query string passed in the request.*/
+query = object containing properties and values of the query string passed in the request.
+
+The query can only contain up to 3 parameters (and no other ones): name, minEmployees, and maxEmployees.
+minEmployees and maxEmployees must be numbers, and minEmployees can't be greather than maxEmployees.*/
 function validateCompanySearchQuery(query) {
   for (const key of Object.keys(query)) {
     if (key !== "name" && key != "minEmployees" && key != "maxEmployees") {
