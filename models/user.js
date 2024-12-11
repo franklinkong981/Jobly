@@ -121,20 +121,15 @@ class User {
   /** Given a username, return data about user.
    *
    * Returns { username, first_name, last_name, is_admin, jobs }
-   *   where jobs is { id, title, company_handle, company_name, state }
+   *   where jobs is [jobId, jobId,...] aka a list of job IDs that the user has applied for.
    *
    * Throws NotFoundError if user not found.
    **/
 
   static async get(username) {
     const userRes = await db.query(
-          `SELECT username,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
-                  is_admin AS "isAdmin"
-           FROM users
-           WHERE username = $1`,
+          `SELECT username, first_name AS "firstName", last_name AS "lastName", email, is_admin AS "isAdmin"
+           FROM users WHERE username = $1`,
         [username],
     );
 
@@ -142,7 +137,13 @@ class User {
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
-    return user;
+    const appliedJobsRes = await db.query(`SELECT job_id FROM applications WHERE username = $1`, [username]);
+    const jobs = appliedJobsRes.rows.map((a) => a.job_id);
+    
+    return {
+      ...user,
+      jobs
+    };
   }
 
   /** Update user data with `data`.
@@ -210,8 +211,14 @@ class User {
 
   /**Apply to a job. Adds the username of the user who applied and the id of the job they applied to into the applications table. */
   static async applyToJob(username, jobId) {
-    await this.get(username);
-    await Job.get(jobId);
+    const user = await db.query(`SELECT username FROM users WHERE username = $1`, [username]);
+    if (user.rows.length === 0) throw new NotFoundError(`No user: ${username}`);
+
+    const job = await db.query(`SELECT id FROM jobs WHERE id = $1`, [jobId]);
+    if (job.rows.length === 0) throw new NotFoundError(`No job with id of ${jobId}`);
+
+    const appResult = await db.query(`SELECT username, job_id FROM applications WHERE username = $1 AND job_id = $2`, [username,jobId]);
+    if (appResult.rows.length !== 0) throw new BadRequestError(`The user ${username} has already applied to the job with id ${jobId}!`);
 
     await db.query(`INSERT INTO applications (username, job_id) VALUES ($1, $2) RETURNING job_id`, [username, jobId]);
   }

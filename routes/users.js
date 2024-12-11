@@ -53,10 +53,10 @@ router.post("/", ensureLoggedIn, ensureIsAdmin, async function (req, res, next) 
 */
 router.post("/:username/jobs/:id", ensureLoggedIn, ensureIsAdminOrCorrectUser, async function (req, res, next) {
   try {
-    const {username, jobId} = req.params;
-    await User.applyToJob(username, jobId);
+    const {username, id} = req.params;
+    await User.applyToJob(username, id);
 
-    return res.json({applied: jobId});
+    return res.json({applied: id});
   } catch (err) {
     return next(err);
   }
