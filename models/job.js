@@ -16,22 +16,22 @@ class Job {
    * Throws BadRequestError if company already in database.
    * */
 
-  static async create({ id, title, salary, equity, companyHandle }) {
+  static async create({ title, salary, equity, companyHandle }) {
     const doesCompanyExistCheck = await db.query(
           `SELECT handle
            FROM companies
            WHERE handle = $1`,
-        [req.body.companyHandle]);
+        [companyHandle]);
 
-    if (doesCompanyExistCheck.rows[0])
-      throw new BadRequestError(`Company with handle of ${req.body.companyHandle} does not exist`);
+    if (doesCompanyExistCheck.rows.length === 0)
+      throw new BadRequestError(`Company with handle of ${companyHandle} does not exist`);
 
     const result = await db.query(
           `INSERT INTO jobs
-           (id, title, salary, equity, company_handle)
-           VALUES ($1, $2, $3, $4, $5)
+           (title, salary, equity, company_handle)
+           VALUES ($1, $2, $3, $4)
            RETURNING id, title, salary, equity, company_handle AS "companyHandle"`,
-        [id, title, salary, equity, companyHandle]
+        [title, salary, equity, companyHandle]
     );
     const new_job = result.rows[0];
 

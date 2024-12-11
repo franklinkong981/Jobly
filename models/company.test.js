@@ -87,7 +87,7 @@ describe("findAll", function () {
   });
 });
 
-/************************************** findAll */
+/************************************** findFiltered */
 
 describe("findFiltered", function() {
   test("works: name only", async function() {
