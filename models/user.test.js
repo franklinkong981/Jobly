@@ -1,18 +1,9 @@
 "use strict";
 
-const {
-  NotFoundError,
-  BadRequestError,
-  UnauthorizedError,
-} = require("../errors/expressError");
+const {NotFoundError, BadRequestError, UnauthorizedError} = require("../errors/expressError");
 const db = require("../db.js");
 const User = require("./user.js");
-const {
-  commonBeforeAll,
-  commonBeforeEach,
-  commonAfterEach,
-  commonAfterAll,
-} = require("./_testCommon.js");
+const {commonBeforeAll, commonBeforeEach, commonAfterEach, commonAfterAll} = require("./_testCommon.js");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -140,6 +131,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: true,
+      jobs: [1]
     });
   });
 
@@ -225,6 +217,49 @@ describe("remove", function () {
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+});
+
+describe("applyToJob", function() {
+  test("works", async function () {
+    await User.applyToJob("u1", 3);
+
+    let user = await User.get("u1");
+    expect(user).toEqual({
+      username: "u1",
+      firstName: "U1F",
+      lastName: "U1L",
+      email: "u1@email.com",
+      isAdmin: true,
+      jobs: [1, 3]
+    });
+  });
+
+  test("FAILS: user not found", async function () {
+    try {
+      await User.applyToJob("u4", 3);
+      fail();
+    } catch(err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  test("FAILS: job not found", async function() {
+    try {
+      await User.applyToJob("u1", 100);
+      fail();
+    } catch(err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  test("FAILS: User already applied to job", async function() {
+    try {
+      await User.applyToJob("u1", 1);
+      fail();
+    } catch(err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
 });

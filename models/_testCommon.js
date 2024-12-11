@@ -12,6 +12,8 @@ async function commonBeforeAll() {
   await db.query("DELETE FROM jobs");
   await db.query("ALTER SEQUENCE jobs_id_seq RESTART WITH 1");
 
+  await db.query("DELETE FROM applications");
+
   await db.query(`
     INSERT INTO companies(handle, name, num_employees, description, logo_url)
     VALUES ('c1', 'C1', 1, 'Desc1', 'http://c1.img'),
@@ -29,6 +31,10 @@ async function commonBeforeAll() {
               ('j2', 150, 0.5, 'c2'),
               ('j3', 200, 0, 'c3'),
               ('j4', 50, 0, 'c1')`);
+  
+
+  //user u1 has applied to job j1 that belongs to company C1.
+  await db.query(`INSERT INTO applications (username, job_id) VALUES ('u1', 1)`);
   
 }
 

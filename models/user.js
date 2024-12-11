@@ -2,14 +2,10 @@
 
 const db = require("../db");
 const bcrypt = require("bcrypt");
+
 const { sqlForPartialUpdate } = require("../helpers/sql");
 const {Job} = require("./job")
-const {
-  NotFoundError,
-  BadRequestError,
-  UnauthorizedError,
-} = require("../errors/expressError");
-
+const {NotFoundError, BadRequestError, UnauthorizedError} = require("../errors/expressError");
 const { BCRYPT_WORK_FACTOR } = require("../config.js");
 
 /** Related functions for users. */
