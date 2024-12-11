@@ -9,7 +9,7 @@ const {sqlForPartialUpdate} = require("../helpers/sql");
 class Job {
   /** Create a job (from data), update db, return new job data.
    *
-   * data should be { id, title, salary, equity, companyHandle }
+   * data should be { title, salary, equity, companyHandle }
    *
    * Returns { id, title, salary, equity, companyHandle }
    *
@@ -17,14 +17,14 @@ class Job {
    * */
 
   static async create({ id, title, salary, equity, companyHandle }) {
-    const duplicateCheck = await db.query(
-          `SELECT id
-           FROM jobs
+    const doesCompanyExistCheck = await db.query(
+          `SELECT handle
+           FROM companies
            WHERE handle = $1`,
-        [id]);
+        [req.body.companyHandle]);
 
-    if (duplicateCheck.rows[0])
-      throw new BadRequestError(`Duplicate job: ${id}`);
+    if (doesCompanyExistCheck.rows[0])
+      throw new BadRequestError(`Company with handle of ${req.body.companyHandle} does not exist`);
 
     const result = await db.query(
           `INSERT INTO jobs
