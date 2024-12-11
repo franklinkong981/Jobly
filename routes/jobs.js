@@ -38,6 +38,19 @@ router.post("/", ensureLoggedIn, ensureIsAdmin, async function (req, res, next) 
   }
 });
 
+/* Validates the query string in a job filtered search. 
+query = object containing properties and values of the query string passed in the request.*/
+function validateJobSearchQuery(query) {
+  for (const key of Object.keys(query)) {
+    if (key !== "title" && key != "minSalary" && key != "hasEquity") {
+      throw new BadRequestError("The query string must only contain the following properties: title, minSalary, hasEquity");
+    }
+  }
+  if (Object.hasOwn(query, "minEmployees") && Object.hasOwn(query, "maxEmployees") && query.minEmployees > query.maxEmployees) {
+    throw new BadRequestError("The minEmployees cannot be greater than maxEmployees");
+  }
+}
+
 /** GET /  =>
  *   { jobs: [ { id, title, salary, equity, companyHandle }, ...] }
  *

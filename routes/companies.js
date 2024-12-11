@@ -44,9 +44,18 @@ query = object containing properties and values of the query string passed in th
 function validateCompanySearchQuery(query) {
   for (const key of Object.keys(query)) {
     if (key !== "name" && key != "minEmployees" && key != "maxEmployees") {
-      throw new BadRequestError("The query string must only containg the following properties: name, minEmployees, and maxEmployees");
+      throw new BadRequestError("The query string must only contain the following properties: name, minEmployees, and maxEmployees");
     }
   }
+
+  //make sure minEmployees and maxEmployees are numbers.
+  if (Object.hasOwn(query, "minEmployees") && isNaN(parseInt(query.minEmployees))) {
+    throw new BadRequestError("minEmployees parameter in the query string must be a number");
+  }
+  if (Object.hasOwn(query, "maxEmployees") && isNaN(parseInt(query.maxEmployees))) {
+    throw new BadRequestError("maxEmployees parameter in the query string must be a number");
+  }
+  
   if (Object.hasOwn(query, "minEmployees") && Object.hasOwn(query, "maxEmployees") && query.minEmployees > query.maxEmployees) {
     throw new BadRequestError("The minEmployees cannot be greater than maxEmployees");
   }

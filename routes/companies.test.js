@@ -130,11 +130,23 @@ describe("GET /companies", function () {
   test("FAILS: Query string contains invalid parameters", async function() {
     const resp = await request(app).get("/companies?name=c1&movie=Dark&minEmployees=2");
     expect(resp.statusCode).toEqual(400);
-    expect(resp.body.error.message).toEqual("The query string must only containg the following properties: name, minEmployees, and maxEmployees");
+    expect(resp.body.error.message).toEqual("The query string must only contain the following properties: name, minEmployees, and maxEmployees");
+  });
+
+  test("FAILS: minEmployees is not a number", async function() {
+    const resp = await request(app).get("/companies?minEmployees=abc&maxEmployees=1");
+    expect(resp.statusCode).toEqual(400);
+    expect(resp.body.error.message).toEqual("minEmployees parameter in the query string must be a number");
+  });
+
+  test("FAILS: maxEmployees is not a number", async function() {
+    const resp = await request(app).get("/companies?minEmployees=10&maxEmployees=abc");
+    expect(resp.statusCode).toEqual(400);
+    expect(resp.body.error.message).toEqual("maxEmployees parameter in the query string must be a number");
   });
 
   test("FAILS: minEmployees > maxEmployees", async function() {
-    const resp = await request(app).get("/companies?minEmployees=3&maxEmployees=2");
+    const resp = await request(app).get("/companies?minEmployees=10&maxEmployees=1");
     expect(resp.statusCode).toEqual(400);
     expect(resp.body.error.message).toEqual("The minEmployees cannot be greater than maxEmployees");
   });
