@@ -127,39 +127,45 @@ describe("GET /jobs", function () {
               id: 3,
               title: 'j3',
               salary: 200,
-              equity: "0.7",
+              equity: "0",
               companyHandle: 'c3'
             }
           ]
     });
   });
 
-  /*test("ok for anon with filtering", async function() {
-    const resp = await request(app).get("/companies?name=c1");
+  test("ok for anon with filtering", async function() {
+    const resp = await request(app).get("/jobs?title=J&minSalary=150&hasEquity=true");
     expect(resp.body).toEqual({
-      companies: [
+      allJobs: [
         {
-          handle: "c1",
-          name: "C1",
-          description: "Desc1",
-          numEmployees: 1,
-          logoUrl: "http://c1.img"
+          id: 2,
+          title: 'j2',
+          salary: 150,
+          equity: "0.5",
+          companyHandle: 'c2'
         }
       ]
     });
   });
 
   test("FAILS: Query string contains invalid parameters", async function() {
-    const resp = await request(app).get("/companies?name=c1&movie=Dark&minEmployees=2");
+    const resp = await request(app).get("/jobs?title=j1&minSalary=100&ceo=franklin");
     expect(resp.statusCode).toEqual(400);
-    expect(resp.body.error.message).toEqual("The query string must only containg the following properties: name, minEmployees, and maxEmployees");
+    expect(resp.body.error.message).toEqual("The query string must only contain the following properties: title, minSalary, hasEquity");
   });
 
-  test("FAILS: minEmployees > maxEmployees", async function() {
-    const resp = await request(app).get("/companies?minEmployees=3&maxEmployees=2");
+  test("FAILS: minSalary is not a number", async function() {
+    const resp = await request(app).get("/jobs?title=j1&minSalary=abc");
     expect(resp.statusCode).toEqual(400);
-    expect(resp.body.error.message).toEqual("The minEmployees cannot be greater than maxEmployees");
-  });*/
+    expect(resp.body.error.message).toEqual("minSalary parameter in the query string must be a number");
+  });
+
+  test("FAILS: hasEquity isn't either true or false", async function() {
+    const resp = await request(app).get("/jobs?title=j1&minSalary=100&hasEquity=amazing");
+    expect(resp.statusCode).toEqual(400);
+    expect(resp.body.error.message).toEqual("hasEquity parameter in the query string must be either true or false");
+  });
 
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---

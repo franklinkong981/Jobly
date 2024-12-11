@@ -74,7 +74,7 @@ describe("findAll", function () {
         id: 3,
         title: 'j3',
         salary: 200,
-        equity: "0.0",
+        equity: "0",
         companyHandle: 'c3'
       }
     ]);
@@ -113,7 +113,7 @@ describe("findFiltered", function() {
         id: 3,
         title: 'j3',
         salary: 200,
-        equity: "0.0",
+        equity: "0",
         companyHandle: 'c3'
       }
     ]);
@@ -168,7 +168,7 @@ describe("findFiltered", function() {
         id: 3,
         title: 'j3',
         salary: 200,
-        equity: "0.0",
+        equity: "0",
         companyHandle: 'c3'
       }
     ]);
