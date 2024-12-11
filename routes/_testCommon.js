@@ -51,7 +51,7 @@ async function commonBeforeAll() {
   await Job.create({title: 'j1', salary: 100, equity: 0.6, companyHandle: 'c1'});
   await Job.create({title: 'j2', salary: 150, equity: 0.5, companyHandle: 'c2'});
   await Job.create({title: 'j3', salary: 200, equity: 0.0, companyHandle: 'c3'});
-  await Job.create({title: 'j4', salary: 50, equity: 0.0, companyHandle: 'c1'})
+  await Job.create({title: 'j4', salary: 50, equity: 0.0, companyHandle: 'c1'});
 
   await User.register({
     username: "u1",
@@ -77,6 +77,8 @@ async function commonBeforeAll() {
     password: "password3",
     isAdmin: false,
   });
+
+  await User.applyToJob("u2", 1);
 }
 
 async function commonBeforeEach() {

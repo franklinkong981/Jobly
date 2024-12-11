@@ -199,6 +199,7 @@ describe("GET /users/:username", function () {
         lastName: "U2L",
         email: "user2@user.com",
         isAdmin: false,
+        jobs: [1]
       },
     });
   });
@@ -214,6 +215,7 @@ describe("GET /users/:username", function () {
         lastName: "U2L",
         email: "user2@user.com",
         isAdmin: false,
+        jobs: [1]
       },
     });
   });
@@ -376,5 +378,92 @@ describe("DELETE /users/:username", function () {
         .delete(`/users/nope`)
         .set("authorization", `Bearer ${u1Token}`);
     expect(resp.statusCode).toEqual(404);
+  });
+});
+
+/************************************** PATCH /users/:username/jobs/:id */
+
+describe("POST /users/:username/jobs/:id", function() {
+  test("Admin can have another user apply to a job", async function() {
+    const resp = await request(app)
+        .post(`/users/u2/jobs/3`)
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.body).toEqual({ applied: "3" });
+
+    const resp2 = await request(app)
+        .get(`/users/u2`)
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp2.body).toEqual({
+      user: {
+        username: "u2",
+        firstName: "U2F",
+        lastName: "U2L",
+        email: "user2@user.com",
+        isAdmin: false,
+        jobs: [1, 3]
+      }
+    });
+  });
+
+  test("User can apply to a job", async function() {
+    const resp = await request(app)
+        .post(`/users/u2/jobs/3`)
+        .set("authorization", `Bearer ${u2Token}`);
+    expect(resp.body).toEqual({ applied: "3" });
+
+    const resp2 = await request(app)
+        .get(`/users/u2`)
+        .set("authorization", `Bearer ${u2Token}`);
+    expect(resp2.body).toEqual({
+      user: {
+        username: "u2",
+        firstName: "U2F",
+        lastName: "U2L",
+        email: "user2@user.com",
+        isAdmin: false,
+        jobs: [1, 3]
+      }
+    });
+  });
+
+  test("Non-logged in user can't have another user apply to a job", async function() {
+    const resp = await request(app).post(`/users/u2/jobs/3`);
+    expect(resp.statusCode).toEqual(401);
+  });
+
+  test("Non-admin can't have another user apply to a job", async function() {
+    const resp = await request(app)
+        .post(`/users/u3/jobs/3`)
+        .set("authorization", `Bearer ${u2Token}`);
+    
+    expect(resp.statusCode).toEqual(403);
+    expect(resp.body.error.message).toEqual("You can only view, edit, or delete information about your own account!");
+  });
+
+  test("FAIL: User not found, should return ForbiddenError", async function() {
+    const resp = await request(app)
+        .post(`/users/u10/jobs/3`)
+        .set("authorization", `Bearer ${u2Token}`);
+    
+    expect(resp.statusCode).toEqual(403);
+    expect(resp.body.error.message).toEqual("You can only view, edit, or delete information about your own account!");
+  });
+
+  test("FAIL: Job not found", async function() {
+    const resp = await request(app)
+        .post(`/users/u2/jobs/10`)
+        .set("authorization", `Bearer ${u2Token}`);
+    
+    expect(resp.statusCode).toEqual(404);
+    expect(resp.body.error.message).toEqual("No job with id of 10");
+  });
+
+  test("FAIL: Can't apply to job you already applied to", async function() {
+    const resp = await request(app)
+        .post(`/users/u2/jobs/1`)
+        .set("authorization", `Bearer ${u2Token}`);
+    
+    expect(resp.statusCode).toEqual(400);
+    expect(resp.body.error.message).toEqual("The user u2 has already applied to the job with id 1!");
   });
 });
