@@ -36,7 +36,7 @@ describe("POST /jobs", function () {
         .set("authorization", `Bearer ${u1Token}`);
     expect(resp.statusCode).toEqual(201);
     expect(resp.body).toEqual({
-      newJob: {id: 4, ...newJob, equity: "0.4"}
+      newJob: {id: 5, ...newJob, equity: "0.4"}
     });
   });
 
@@ -129,7 +129,14 @@ describe("GET /jobs", function () {
               salary: 200,
               equity: "0",
               companyHandle: 'c3'
-            }
+            },
+            {
+              id: 4,
+              title: 'j4',
+              salary: 50,
+              equity: "0",
+              companyHandle: 'c1'
+            },
           ]
     });
   });

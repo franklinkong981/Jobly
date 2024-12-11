@@ -29,14 +29,14 @@ describe("create", function () {
 
   test("works", async function () {
     let job = await Job.create(newJob);
-    expect(job).toEqual({id: 4, title:"New job", salary: 500, equity: "0.333", companyHandle: 'c1'});
+    expect(job).toEqual({id: 5, title:"New job", salary: 500, equity: "0.333", companyHandle: 'c1'});
 
     const result = await db.query(
           `SELECT id, title, salary, equity, company_handle AS "companyHandle"
            FROM jobs
            WHERE title = 'New job'`);
     expect(result.rows).toEqual([
-      {id: 4, title: "New job", salary: 500, equity: "0.333", companyHandle: 'c1'}
+      {id: 5, title: "New job", salary: 500, equity: "0.333", companyHandle: 'c1'}
     ]);
   });
 
@@ -76,6 +76,13 @@ describe("findAll", function () {
         salary: 200,
         equity: "0",
         companyHandle: 'c3'
+      },
+      {
+        id: 4,
+        title: 'j4',
+        salary: 50,
+        equity: '0',
+        companyHandle: 'c1'
       }
     ]);
   });
@@ -170,6 +177,13 @@ describe("findFiltered", function() {
         salary: 200,
         equity: "0",
         companyHandle: 'c3'
+      },
+      {
+        id: 4,
+        title: 'j4',
+        salary: 50,
+        equity: '0',
+        companyHandle: 'c1'
       }
     ]);
   });
@@ -197,7 +211,7 @@ describe("update", function () {
     const result = await db.query(
           `SELECT id, title, salary, equity, company_handle AS "companyHandle"
            FROM jobs
-           WHERE company_handle = 'c1'`);
+           WHERE title = 'New Job'`);
     expect(result.rows).toEqual([{
       id: 1,
       title: "New Job",
@@ -224,7 +238,7 @@ describe("update", function () {
     const result = await db.query(
           `SELECT id, title, salary, equity, company_handle AS "companyHandle"
            FROM jobs
-           WHERE company_handle = 'c1'`);
+           WHERE title = 'New Job'`);
     expect(result.rows).toEqual([{
       id: 1,
       title: "New Job",
@@ -258,7 +272,7 @@ describe("update", function () {
 describe("remove", function () {
   test("works", async function () {
     await Job.remove(1);
-    const res = await db.query("SELECT title FROM jobs WHERE company_handle = 'c1'");
+    const res = await db.query("SELECT title FROM jobs WHERE title = 'j1'");
     expect(res.rows.length).toEqual(0);
   });
 
