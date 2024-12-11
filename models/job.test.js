@@ -74,7 +74,101 @@ describe("findAll", function () {
         id: 3,
         title: 'j3',
         salary: 200,
-        equity: "0.7",
+        equity: "0.0",
+        companyHandle: 'c3'
+      }
+    ]);
+  });
+});
+
+/************************************** findFiltered */
+
+describe("findFiltered", function() {
+  test("works: title only", async function() {
+    const query = {title: "j1"};
+    let filteredJobs = await Job.findFiltered(query);
+    expect(filteredJobs).toEqual([
+      {
+        id: 1,
+        title: 'j1',
+        salary: 100,
+        equity: "0.6",
+        companyHandle: 'c1'
+      }
+    ]);
+  });
+
+  test("works: minSalary only", async function() {
+    const query = {minSalary: 150};
+    let filteredJobs = await Job.findFiltered(query);
+    expect(filteredJobs).toEqual([
+      {
+        id: 2,
+        title: 'j2',
+        salary: 150,
+        equity: "0.5",
+        companyHandle: 'c2'
+      },
+      {
+        id: 3,
+        title: 'j3',
+        salary: 200,
+        equity: "0.0",
+        companyHandle: 'c3'
+      }
+    ]);
+  });
+
+  test("works: hasEquity only", async function() {
+    const query = {hasEquity: "true"};
+    let filteredJobs = await Job.findFiltered(query);
+    expect(filteredJobs).toEqual([
+      {
+        id: 1,
+        title: 'j1',
+        salary: 100,
+        equity: "0.6",
+        companyHandle: 'c1'
+      },
+      {
+        id: 2,
+        title: 'j2',
+        salary: 150,
+        equity: "0.5",
+        companyHandle: 'c2'
+      }
+    ]);
+  });
+
+  test("No matches", async function() {
+    const query = {title: "j1", minSalary: 200, hasEquity: "false"};
+    let filteredJobs = await Job.findFiltered(query);
+    expect(filteredJobs).toEqual([]);
+  });
+
+  test("case-insensitive and LIKE works", async function() {
+    const query = {title: "J"};
+    let filteredJobs = await Job.findFiltered(query);
+    expect(filteredJobs).toEqual([
+      {
+        id: 1,
+        title: 'j1',
+        salary: 100,
+        equity: "0.6",
+        companyHandle: 'c1'
+      },
+      {
+        id: 2,
+        title: 'j2',
+        salary: 150,
+        equity: "0.5",
+        companyHandle: 'c2'
+      },
+      {
+        id: 3,
+        title: 'j3',
+        salary: 200,
+        equity: "0.0",
         companyHandle: 'c3'
       }
     ]);
