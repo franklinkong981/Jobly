@@ -41,6 +41,14 @@ The last thing to do is to make sure the database connection URIs match the ones
 
 Each of the URIs follow this format: postgres://<username>:<password>@127.0.0.1:5432/<database_name>. You need to change the username and password fields to the ones that you entered when setting up Postgres. Otherwise, the app won't run! Once you've done this, change the tests in config.test.js on lines 21 and 24 to change the expected database URIs to the ones you changed the actual database URIs in config.js to so that these tests continue to work.
 
+Finally, to run the commands in jobly.sql file which will insert starter data into the jobly and jobly_test databases, in the command line do:
+
+```
+psql < jobly.sql
+```
+
+Follow the instructions (press Enter key to seed jobly database, then Enter again to seed jobly_test database).
+
 Now you're all set! To run the app, do:
 
 ```
