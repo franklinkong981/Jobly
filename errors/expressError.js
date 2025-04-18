@@ -20,7 +20,7 @@ class NotFoundError extends ExpressError {
   }
 }
 
-/** 401 UNAUTHORIZED error. */
+/** 401 UNAUTHORIZED error aka missing/invalid authentication, usually because user sending the request isn't logged in. */
 
 class UnauthorizedError extends ExpressError {
   constructor(message = "Unauthorized") {
@@ -28,7 +28,10 @@ class UnauthorizedError extends ExpressError {
   }
 }
 
-/** 400 BAD REQUEST error. */
+/** 400 BAD REQUEST error aka request contains
+ * missing body parameters or invalid body parameters or body parameters
+ * that don't follow the correct format.
+*/
 
 class BadRequestError extends ExpressError {
   constructor(message = "Bad Request") {
@@ -36,7 +39,7 @@ class BadRequestError extends ExpressError {
   }
 }
 
-/** 403 BAD REQUEST error. */
+/** 403 BAD REQUEST error aka lack of permission despite valid authentication, usually because user is logged in but isn't an admin. */
 
 class ForbiddenError extends ExpressError {
   constructor(message = "Bad Request") {
