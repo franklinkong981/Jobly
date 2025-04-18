@@ -50,7 +50,8 @@ function ensureLoggedIn(req, res, next) {
 /** Middleware to use when they must be an admin.
  * 
  * If not, raises ForbiddenError.
- * Will usually be run after ensureLoggedIn.
+ * Will usually be run after ensureLoggedIn, so if res.locals.user doesn't exist,
+ * that will be caught by the ensureLoggedIn middleware function.
  */
 
 function ensureIsAdmin(req, res, next){
@@ -70,7 +71,9 @@ function ensureIsAdmin(req, res, next){
 
 function ensureIsAdminOrCorrectUser(req, res, next){
   try{
-    if ((!res.locals.user.isAdmin) && (res.locals.user.username != req.params.username)) {
+    const user = res.locals.user;
+    if (!user) throw new UnauthorizedError("You must be logged in to access this!");
+    if ((!user.isAdmin) && (user.username != req.params.username)) {
       throw new ForbiddenError("You can only view, edit, or delete information about your own account!");
     }
     return next();
