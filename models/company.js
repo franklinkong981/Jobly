@@ -44,53 +44,61 @@ class Company {
     return company;
   }
 
-  /** Find all companies.
+  /** Find all companies (optional filter on searchFilters).
+   *
+   * searchFilters (all optional):
+   * - minEmployees
+   * - maxEmployees (NOTE: maxEmployees must be >= minEmployees)
+   * - name (will find case-insensitive, partial matches)
    *
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll() {
-    const companiesRes = await db.query(
-          `SELECT handle,
-                  name,
-                  description,
-                  num_employees AS "numEmployees",
-                  logo_url AS "logoUrl"
-           FROM companies
-           ORDER BY name`);
-    return companiesRes.rows;
-  }
+  static async findAll(searchFilters = {}) {
+    let findCompaniesQuery = `SELECT handle,
+                        name,
+                        description,
+                        num_employees AS "numEmployees",
+                        logo_url AS "logoUrl"
+                 FROM companies`;
+    //ex. of whereExpressions: ['num_employees >= $1', 'num_employees <= $2']
+    //ex. of queryValues: [30, 100]
+    //ex. of sql statement: ...WHERE whereExpressions[0] AND whereExpressions[1]...
+    let whereExpressions = [];
+    let queryValues = [];
 
-  /** Find all filtered companies whose names or part of their names match the query.name parameter (if provided), have at least
-   * query.minEmployees employees (if provided) and at most query.maxEmployees employees (if provided).
-   *
-   * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
-   * */
-  static async findFiltered(query) {
-    //builds the string to be used after the WHERE clause
-    let numParts = 0;
-    let filteringString = "";
-    if (Object.hasOwn(query, "name")) {
-      filteringString += `name ILIKE '%${query.name}%'`;
-      numParts++;
-    }
-    if (Object.hasOwn(query, "minEmployees")) {
-      if (numParts > 0) filteringString += " AND ";
-      filteringString += `num_employees >= ${query.minEmployees}`;
-      numParts++;
-    }
-    if (Object.hasOwn(query, "maxEmployees")) {
-      if (numParts > 0) filteringString += " AND ";
-      filteringString += `num_employees <= ${query.maxEmployees}`;
+    const { minEmployees, maxEmployees, name } = searchFilters;
+
+    if (minEmployees > maxEmployees) {
+      throw new BadRequestError("Min employees cannot be greater than max");
     }
 
-    const companiesRes = await db.query(
-      `SELECT handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"
-        FROM companies
-        WHERE
-        ${filteringString}
-        ORDER BY name`
-    );
+    // For each possible search term, add to whereExpressions and queryValues so
+    // we can generate the right SQL
+
+    if (minEmployees !== undefined) {
+      queryValues.push(minEmployees);
+      whereExpressions.push(`num_employees >= $${queryValues.length}`);
+    }
+
+    if (maxEmployees !== undefined) {
+      queryValues.push(maxEmployees);
+      whereExpressions.push(`num_employees <= $${queryValues.length}`);
+    }
+
+    if (name) {
+      queryValues.push(`%${name}%`);
+      whereExpressions.push(`name ILIKE $${queryValues.length}`);
+    }
+
+    if (whereExpressions.length > 0) {
+      findCompaniesQuery += " WHERE " + whereExpressions.join(" AND ");
+    }
+
+    // Finalize query and return results
+
+    findCompaniesQuery += " ORDER BY name";
+    const companiesRes = await db.query(findCompaniesQuery, queryValues);
     return companiesRes.rows;
   }
 
