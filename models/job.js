@@ -13,7 +13,7 @@ class Job {
    *
    * Returns { id, title, salary, equity, companyHandle }
    *
-   * Throws BadRequestError if company already in database.
+   * Throws BadRequestError if companyHandle doesn't exist in database.
    * */
 
   static async create({ title, salary, equity, companyHandle }) {
@@ -38,51 +38,54 @@ class Job {
     return new_job;
   }
 
-  /** Find all filtered jobs whose names or part of their names match the query.title parameter (if provided) and has a salary of at least
-   * query.minSalary (if provided). In addition, it only returns jobs with a non-zero equity if the query.hasEquity parameter (if provided)
-   * is set to true.
+  /** Find all jobs (optional filter on searchFilters).
    *
-   * Returns [{ id, title, salary, equity, companyHandle }, ...]
+   * searchFilters (all optional):
+   * - minSalary
+   * - hasEquity (true returns only jobs with equity > 0, other values ignored)
+   * - title (will find case-insensitive, partial matches)
+   *
+   * Returns [{ id, title, salary, equity, companyHandle, companyName }, ...]
    * */
-  static async findFiltered(query) {
-    //builds the string to be used after the WHERE clause
-    let numParts = 0;
-    let filteringString = "";
-    if (Object.hasOwn(query, "title")) {
-      filteringString += `title ILIKE '%${query.title}%'`;
-      numParts++;
-    }
-    if (Object.hasOwn(query, "minSalary")) {
-      if (numParts > 0) filteringString += " AND ";
-      filteringString += `salary >= ${query.minSalary}`;
-      numParts++;
-    }
-    if (Object.hasOwn(query, "hasEquity") && query.hasEquity === "true") {
-      if (numParts > 0) filteringString += " AND ";
-      filteringString += `equity > 0`;
+
+  static async findAll({ minSalary, hasEquity, title } = {}) {
+    let findJobsQuery = `SELECT j.id,
+                        j.title,
+                        j.salary,
+                        j.equity,
+                        j.company_handle AS "companyHandle",
+                        c.name AS "companyName"
+                 FROM jobs j 
+                   LEFT JOIN companies AS c ON c.handle = j.company_handle`;
+    let whereExpressions = [];
+    let queryValues = [];
+
+    // For each possible search term, add to whereExpressions and
+    // queryValues so we can generate the right SQL
+
+    if (minSalary !== undefined) {
+      queryValues.push(minSalary);
+      whereExpressions.push(`salary >= $${queryValues.length}`);
     }
 
-    const jobsRes = await db.query(
-      `SELECT id, title, salary, equity, company_handle AS "companyHandle"
-        FROM jobs
-        WHERE
-        ${filteringString}
-        ORDER BY title`
-    );
+    if (hasEquity !== undefined && hasEquity === true) {
+      whereExpressions.push(`equity > 0`);
+    }
+
+    if (title !== undefined) {
+      queryValues.push(`%${title}%`);
+      whereExpressions.push(`title ILIKE $${queryValues.length}`);
+    }
+
+    if (whereExpressions.length > 0) {
+      findJobsQuery += " WHERE " + whereExpressions.join(" AND ");
+    }
+
+    // Finalize query and return results
+
+    findJobsQuery += " ORDER BY title";
+    const jobsRes = await db.query(findJobsQuery, queryValues);
     return jobsRes.rows;
-  }
-
-  /** Find and return all jobs.
-   *
-   * Returns [{ id, title, salary, equity, companyHandle }, ...]
-   * */
-
-  static async findAll() {
-    const allJobsRes = await db.query(
-          `SELECT id, title, salary, equity, company_handle AS "companyHandle"
-           FROM jobs
-           ORDER BY title`);
-    return allJobsRes.rows;
   }
 
   /** Given a job id, return data about the job.
