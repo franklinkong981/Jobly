@@ -75,7 +75,7 @@ function validateJobSearchQuery(query) {
       } else {
         validateJobSearchQuery(req.query);
 
-        allJobs = await Job.findFiltered(req.query);
+        allJobs = await Job.findAll(req.query);
       }
 
       console.log(`Got total of ${allJobs.length} jobs!`);

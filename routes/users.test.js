@@ -199,7 +199,7 @@ describe("GET /users/:username", function () {
         lastName: "U2L",
         email: "user2@user.com",
         isAdmin: false,
-        jobs: [1]
+        appliedJobs: [1]
       },
     });
   });
@@ -215,7 +215,7 @@ describe("GET /users/:username", function () {
         lastName: "U2L",
         email: "user2@user.com",
         isAdmin: false,
-        jobs: [1]
+        appliedJobs: [1]
       },
     });
   });
@@ -400,7 +400,7 @@ describe("POST /users/:username/jobs/:id", function() {
         lastName: "U2L",
         email: "user2@user.com",
         isAdmin: false,
-        jobs: [1, 3]
+        appliedJobs: [1, 3]
       }
     });
   });
@@ -421,7 +421,7 @@ describe("POST /users/:username/jobs/:id", function() {
         lastName: "U2L",
         email: "user2@user.com",
         isAdmin: false,
-        jobs: [1, 3]
+        appliedJobs: [1, 3]
       }
     });
   });

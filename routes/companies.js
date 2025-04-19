@@ -87,7 +87,7 @@ router.get("/", async function (req, res, next) {
     } else {
       validateCompanySearchQuery(req.query);
         
-      companies = await Company.findFiltered(req.query);
+      companies = await Company.findAll(req.query);
     }
 
     console.log(`Got total of ${companies.length} companies!`);

@@ -131,7 +131,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: true,
-      jobs: [1]
+      appliedJobs: [1]
     });
   });
 
@@ -232,7 +232,7 @@ describe("applyToJob", function() {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: true,
-      jobs: [1, 3]
+      appliedJobs: [1, 3]
     });
   });
 

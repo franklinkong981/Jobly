@@ -61,28 +61,32 @@ describe("findAll", function () {
         title: 'j1',
         salary: 100,
         equity: "0.6",
-        companyHandle: 'c1'
+        companyHandle: 'c1',
+        companyName: 'C1'
       },
       {
         id: 2,
         title: 'j2',
         salary: 150,
         equity: "0.5",
-        companyHandle: 'c2'
+        companyHandle: 'c2',
+        companyName: 'C2'
       },
       {
         id: 3,
         title: 'j3',
         salary: 200,
         equity: "0",
-        companyHandle: 'c3'
+        companyHandle: 'c3',
+        companyName: 'C3'
       },
       {
         id: 4,
         title: 'j4',
         salary: 50,
         equity: '0',
-        companyHandle: 'c1'
+        companyHandle: 'c1',
+        companyName: 'C1'
       }
     ]);
   });
@@ -100,7 +104,8 @@ describe("findFiltered", function() {
         title: 'j1',
         salary: 100,
         equity: "0.6",
-        companyHandle: 'c1'
+        companyHandle: 'c1',
+        companyName: 'C1'
       }
     ]);
   });
@@ -114,14 +119,16 @@ describe("findFiltered", function() {
         title: 'j2',
         salary: 150,
         equity: "0.5",
-        companyHandle: 'c2'
+        companyHandle: 'c2',
+        companyName: 'C2'
       },
       {
         id: 3,
         title: 'j3',
         salary: 200,
         equity: "0",
-        companyHandle: 'c3'
+        companyHandle: 'c3',
+        companyName: 'C3'
       }
     ]);
   });
@@ -135,14 +142,16 @@ describe("findFiltered", function() {
         title: 'j1',
         salary: 100,
         equity: "0.6",
-        companyHandle: 'c1'
+        companyHandle: 'c1',
+        companyName: 'C1'
       },
       {
         id: 2,
         title: 'j2',
         salary: 150,
         equity: "0.5",
-        companyHandle: 'c2'
+        companyHandle: 'c2',
+        companyName: 'C2'
       }
     ]);
   });
@@ -162,30 +171,64 @@ describe("findFiltered", function() {
         title: 'j1',
         salary: 100,
         equity: "0.6",
-        companyHandle: 'c1'
+        companyHandle: 'c1',
+        companyName: 'C1'
       },
       {
         id: 2,
         title: 'j2',
         salary: 150,
         equity: "0.5",
-        companyHandle: 'c2'
+        companyHandle: 'c2',
+        companyName: 'C2'
       },
       {
         id: 3,
         title: 'j3',
         salary: 200,
         equity: "0",
-        companyHandle: 'c3'
+        companyHandle: 'c3',
+        companyName: 'C3'
       },
       {
         id: 4,
         title: 'j4',
         salary: 50,
         equity: '0',
-        companyHandle: 'c1'
+        companyHandle: 'c1',
+        companyName: 'C1'
       }
     ]);
+  });
+});
+
+/************************************** get */
+
+describe("get", function() {
+  test("works", async function() {
+    let job1 = await Job.get(1);
+    expect(job1).toEqual({
+      id: 1,
+      title: 'j1',
+      salary: 100,
+      equity: "0.6",
+      company: {
+        handle: 'c1',
+        name: 'C1',
+        description: 'Desc1',
+        numEmployees: 1,
+        logoUrl: "http://c1.img"
+      }
+    });
+  });
+
+  test("not found if no such id", async function() {
+    try {
+      await Job.get(100);
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
   });
 });
 
