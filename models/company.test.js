@@ -87,12 +87,12 @@ describe("findAll", function () {
   });
 });
 
-/************************************** findFiltered */
+/************************************** findAll with filter*/
 
 describe("findFiltered", function() {
   test("works: name only", async function() {
     const query = {name: "c3"};
-    let filteredCompanies = await Company.findFiltered(query);
+    let filteredCompanies = await Company.findAll(query);
     expect(filteredCompanies).toEqual([
       {
         handle: "c3",
@@ -106,7 +106,7 @@ describe("findFiltered", function() {
 
   test("works: minEmployees only", async function() {
     const query = {minEmployees: 2};
-    let filteredCompanies = await Company.findFiltered(query);
+    let filteredCompanies = await Company.findAll(query);
     expect(filteredCompanies).toEqual([
       {
         handle: "c2",
@@ -127,7 +127,7 @@ describe("findFiltered", function() {
 
   test("works: maxEmployees only", async function() {
     const query = {maxEmployees: 2};
-    let filteredCompanies = await Company.findFiltered(query);
+    let filteredCompanies = await Company.findAll(query);
     expect(filteredCompanies).toEqual([
       {
         handle: "c1",
@@ -148,7 +148,7 @@ describe("findFiltered", function() {
 
   test("All 3", async function() {
     const query = {name: "c2", minEmployees: 2, maxEmployees: 2};
-    let filteredCompanies = await Company.findFiltered(query);
+    let filteredCompanies = await Company.findAll(query);
     expect(filteredCompanies).toEqual([
       {
         handle: "c2",
@@ -162,13 +162,13 @@ describe("findFiltered", function() {
 
   test("no matches", async function() {
     const query = {name: "IBM", minEmployees: 2, maxEmployees: 2};
-    let filteredCompanies = await Company.findFiltered(query);
+    let filteredCompanies = await Company.findAll(query);
     expect(filteredCompanies).toEqual([]);
   });
 
   test("case-insensitive and LIKE works", async function() {
     const query = {name: "C"};
-    let filteredCompanies = await Company.findFiltered(query);
+    let filteredCompanies = await Company.findAll(query);
     expect(filteredCompanies).toEqual([
       {
         handle: "c1",
