@@ -88,9 +88,10 @@ class Job {
     return jobsRes.rows;
   }
 
-  /** Given a job id, return data about the job.
+  /** Given a job id, return data about the job and the company it belongs to.
    *
-   * Returns { id, title, salary, equity, companyHandle }
+   * Returns { id, title, salary, equity, company }
+   *   where company is { handle, name, description, numEmployees, logoUrl }
    *
    * Throws NotFoundError if not found.
    **/
@@ -105,6 +106,18 @@ class Job {
     const job = jobRes.rows[0];
 
     if (!job) throw new NotFoundError(`Job with id of ${id} not found`);
+
+    const companiesRes = await db.query(
+      `SELECT handle,
+              name,
+              description,
+              num_employees AS "numEmployees",
+              logo_url AS "logoUrl"
+       FROM companies
+       WHERE handle = $1`, [job.companyHandle]);
+
+    delete job.companyHandle;
+    job.company = companiesRes.rows[0];
 
     return job;
   }
@@ -141,7 +154,7 @@ class Job {
     return job;
   }
 
-  /** Delete given job from database; returns undefined.
+  /** Delete given job from database; returns id and title of job just deleted.
    *
    * Throws NotFoundError if job not found.
    **/
