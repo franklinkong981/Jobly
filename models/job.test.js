@@ -88,12 +88,12 @@ describe("findAll", function () {
   });
 });
 
-/************************************** findFiltered */
+/************************************** findAll with filter */
 
 describe("findFiltered", function() {
   test("works: title only", async function() {
     const query = {title: "j1"};
-    let filteredJobs = await Job.findFiltered(query);
+    let filteredJobs = await Job.findAll(query);
     expect(filteredJobs).toEqual([
       {
         id: 1,
@@ -107,7 +107,7 @@ describe("findFiltered", function() {
 
   test("works: minSalary only", async function() {
     const query = {minSalary: 150};
-    let filteredJobs = await Job.findFiltered(query);
+    let filteredJobs = await Job.findAll(query);
     expect(filteredJobs).toEqual([
       {
         id: 2,
@@ -128,7 +128,7 @@ describe("findFiltered", function() {
 
   test("works: hasEquity only", async function() {
     const query = {hasEquity: "true"};
-    let filteredJobs = await Job.findFiltered(query);
+    let filteredJobs = await Job.findAll(query);
     expect(filteredJobs).toEqual([
       {
         id: 1,
@@ -149,13 +149,13 @@ describe("findFiltered", function() {
 
   test("No matches", async function() {
     const query = {title: "j1", minSalary: 200, hasEquity: "false"};
-    let filteredJobs = await Job.findFiltered(query);
+    let filteredJobs = await Job.findAll(query);
     expect(filteredJobs).toEqual([]);
   });
 
   test("case-insensitive and LIKE works", async function() {
     const query = {title: "J"};
-    let filteredJobs = await Job.findFiltered(query);
+    let filteredJobs = await Job.findAll(query);
     expect(filteredJobs).toEqual([
       {
         id: 1,
