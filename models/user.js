@@ -4,7 +4,6 @@ const db = require("../db");
 const bcrypt = require("bcrypt");
 
 const { sqlForPartialUpdate } = require("../helpers/sql");
-const {Job} = require("./job")
 const {NotFoundError, BadRequestError, UnauthorizedError} = require("../errors/expressError");
 const { BCRYPT_WORK_FACTOR } = require("../config.js");
 
@@ -134,11 +133,11 @@ class User {
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
     const appliedJobsRes = await db.query(`SELECT job_id FROM applications WHERE username = $1`, [username]);
-    const jobs = appliedJobsRes.rows.map((a) => a.job_id);
+    const appliedJobs = appliedJobsRes.rows.map(a => a.job_id);
     
     return {
       ...user,
-      jobs
+      appliedJobs
     };
   }
 
@@ -205,7 +204,13 @@ class User {
     if (!user) throw new NotFoundError(`No user: ${username}`);
   }
 
-  /**Apply to a job. Adds the username of the user who applied and the id of the job they applied to into the applications table. */
+  /**Apply to a job. Adds the username of the user who applied and the id of the job they applied to into the applications table. 
+   * 
+   * - username: Username of user applying to the job
+   * - jobId: ID of job that's being applied to.
+   * 
+   * Returns id of job user applied to in this transaction.
+  */
   static async applyToJob(username, jobId) {
     const user = await db.query(`SELECT username FROM users WHERE username = $1`, [username]);
     if (user.rows.length === 0) throw new NotFoundError(`No user: ${username}`);
