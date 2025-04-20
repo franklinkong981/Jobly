@@ -74,12 +74,6 @@ function validateJobSearchQuery(query) {
       if (Object.keys(req.query).length === 0) {
         allJobs = await Job.findAll();
       } else {
-        const validator = jsonschema.validate(q, jobSearchSchema);
-        if (!validator.valid) {
-          const errs = validator.errors.map(e => e.stack);
-          throw new BadRequestError(errs);
-        }
-
         validateJobSearchQuery(req.query);
 
         allJobs = await Job.findAll(req.query);

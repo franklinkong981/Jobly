@@ -86,14 +86,6 @@ router.get("/", async function (req, res, next) {
     if (Object.keys(req.query).length === 0) {
       companies = await Company.findAll();
     } else {
-      //This makes sure each parameter in body is of the correct format.
-      const validator = jsonschema.validate(q, companySearchSchema);
-      if (!validator.valid) {
-        const errs = validator.errors.map(e => e.stack);
-        throw new BadRequestError(errs);
-      }
-
-      //This ensures each body in parameter follows specific constraints.
       validateCompanySearchQuery(req.query);
         
       companies = await Company.findAll(req.query);
