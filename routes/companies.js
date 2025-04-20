@@ -11,6 +11,7 @@ const Company = require("../models/company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
+const companySearchSchema = require("../schemas/companySearch.json");
 
 const router = new express.Router();
 
@@ -90,8 +91,7 @@ router.get("/", async function (req, res, next) {
       companies = await Company.findAll(req.query);
     }
 
-    console.log(`Got total of ${companies.length} companies!`);
-    return res.json({ companies });
+    return res.status(200).json({ companies });
   } catch (err) {
     return next(err);
   }
