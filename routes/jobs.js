@@ -11,6 +11,7 @@ const Job = require("../models/job");
 
 const jobNewSchema = require("../schemas/jobNew.json");
 const jobUpdateSchema = require("../schemas/jobUpdate.json");
+const jobSearchSchema = require("../schemas/jobSearch.json");
 
 const router = new express.Router();
 
@@ -73,13 +74,19 @@ function validateJobSearchQuery(query) {
       if (Object.keys(req.query).length === 0) {
         allJobs = await Job.findAll();
       } else {
+        const validator = jsonschema.validate(q, jobSearchSchema);
+        if (!validator.valid) {
+          const errs = validator.errors.map(e => e.stack);
+          throw new BadRequestError(errs);
+        }
+
         validateJobSearchQuery(req.query);
 
         allJobs = await Job.findAll(req.query);
       }
 
       console.log(`Got total of ${allJobs.length} jobs!`);
-      return res.json({ allJobs });
+      return res.status(200).json({ allJobs });
     } catch (err) {
       return next(err);
     }
