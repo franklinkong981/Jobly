@@ -62,7 +62,7 @@ function validateJobSearchQuery(query) {
 }
 
 /** GET /  =>
- *   { jobs: [ { id, title, salary, equity, companyHandle }, ...] }
+ *   { jobs: [ { id, title, salary, equity, companyHandle, companyName }, ...] }
  *
  * Authorization required: none
  */
